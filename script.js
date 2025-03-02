@@ -1,7 +1,7 @@
-mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
+mapboxgl.accessToken = 'pk.eyJ1Ijoic3RlcGhlbmtlbm5lZHkiLCJhIjoidjE2aTktdyJ9.gpYsw_JQAEuHlK5rAq0rsw';
 const map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/YOUR_USERNAME/YOUR_STYLE_ID',
+    style: 'mapbox://styles/stephenkennedy/cm7s27fp5001t01s0c1jgf18b',
     center: [-89.4012, 43.0731], // Center on Madison, WI
     zoom: 12
 });
@@ -9,14 +9,14 @@ const map = new mapboxgl.Map({
 map.on('load', () => {
     map.addSource('madison-cycleways', {
         type: 'vector',
-        url: 'mapbox://YOUR_TILES_ID'
+        url: 'mapbox://stephenkennedy.madison-cycleways'
     });
 
     map.addLayer({
         id: 'cycleways',
         type: 'line',
         source: 'madison-cycleways',
-        'source-layer': 'YOUR_SOURCE_LAYER_NAME',
+        'source-layer': 'cycleways',
         paint: {
             'line-width': 3,
             'line-color': [
