@@ -20,10 +20,9 @@ map.on('load', () => {
         paint: {
             'line-width': 3,
             'line-color': [
-                'match', ['get', 'cycleway'],
-                'track', '#1f78b4',
-                'lane', '#33a02c',
-                'shared', '#ff7f00',
+                'match', ['get', 'cycleway_category'],
+                'Dedicated Lane', '#1f78b4',
+                'Shared Lane', '#ff7f00',
                 '#999999' // Default
             ]
         }
@@ -33,20 +32,20 @@ map.on('load', () => {
     const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
     map.on('mousemove', 'cycleways', (e) => {
         const properties = e.features[0].properties;
-        const description = `Highway: ${properties.highway}<br>Cycleway: ${properties.cycleway || 'N/A'}`;
+        const description = `Category: ${properties.cycleway_category}<br>Highway: ${properties.highway}`;
         popup.setLngLat(e.lngLat).setHTML(description).addTo(map);
     });
     map.on('mouseleave', 'cycleways', () => popup.remove());
 
     // Interactive legend
     const legend = document.getElementById('legend');
-    const categories = ['track', 'lane', 'shared'];
+    const categories = ['Dedicated Lane', 'Shared Lane'];
     categories.forEach(category => {
         const item = document.createElement('div');
         item.textContent = category;
         item.style.cursor = 'pointer';
         item.onmouseover = () => {
-            map.setFilter('cycleways', ['==', ['get', 'cycleway'], category]);
+            map.setFilter('cycleways', ['==', ['get', 'cycleway_category'], category]);
         };
         item.onmouseleave = () => {
             map.setFilter('cycleways', null);
