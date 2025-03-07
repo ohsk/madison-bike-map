@@ -7,49 +7,53 @@ const map = new mapboxgl.Map({
 });
 
 map.on('load', () => {
-    map.addSource('madison-cycleways', {
+    map.addSource('madison-cycleways-OSM', {
         type: 'vector',
         url: 'mapbox://stephenkennedy.madison-cycleways'
     });
 
     map.addLayer({
-        id: 'cycleways',
-        type: 'line',
-        source: 'madison-cycleways',
+        'id': 'shared-lane-right',
+        'type': 'line',
+        'source': 'madison-cycleways-OSM',
         'source-layer': 'cycleways',
-        paint: {
-            'line-width': 3,
-            'line-color': [
-                'match', ['get', 'cycleway_category'],
-                'Dedicated Lane', '#1f78b4',
-                'Shared Lane', '#ff7f00',
-                '#999999' // Default
+        'slot': 'middle',
+        'filter': [
+            'any',
+            ['==', ['get', 'cycleway:right'], 'shared_lane'],
+            ['==', ['get', 'cycleway:right'], 'share_busway'],
+            ['==', ['get', 'cycleway:both'], 'shared_lane'],
+            ['==', ['get', 'cycleway:both'], 'share_busway'],
+            ['==', ['get', 'cycleway'], 'shared_lane'],
+            ['==', ['get', 'cycleway'], 'share_busway'],
+            ['==', ['get', 'cyclestreet'], 'yes'],
+            [
+                'all',
+                ['==', ['get', 'oneway'], 'yes'],
+                ['==', ['get', 'cycleway'], 'shared_lane']
+            ],
+            [
+                'all',
+                ['==', ['get', 'oneway'], 'yes'],
+                ['==', ['get', 'cycleway'], 'share_busway']
             ]
+        ],
+        'paint': {
+            'line-width': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                0,
+                0.25,
+                14,
+                2,
+                22,
+                3
+            ],
+            'line-color': '#9ca9e5',
+            'line-dasharray': [2, 1],
+            'line-offset': 2
         }
     });
 
-    // Tooltip on hover
-    const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
-    map.on('mousemove', 'cycleways', (e) => {
-        const properties = e.features[0].properties;
-        const description = `Category: ${properties.cycleway_category}<br>Highway: ${properties.highway}`;
-        popup.setLngLat(e.lngLat).setHTML(description).addTo(map);
-    });
-    map.on('mouseleave', 'cycleways', () => popup.remove());
-
-    // Interactive legend
-    const legend = document.getElementById('legend');
-    const categories = ['Dedicated Lane', 'Shared Lane'];
-    categories.forEach(category => {
-        const item = document.createElement('div');
-        item.textContent = category;
-        item.style.cursor = 'pointer';
-        item.onmouseover = () => {
-            map.setFilter('cycleways', ['==', ['get', 'cycleway_category'], category]);
-        };
-        item.onmouseleave = () => {
-            map.setFilter('cycleways', null);
-        };
-        legend.appendChild(item);
-    });
 });
